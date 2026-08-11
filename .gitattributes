@@ -1,0 +1,12 @@
+# Scripts de shell y archivos de texto: LF
+*.sh text eol=lf
+*.java text
+*.xml text
+*.properties text
+*.yml text
+*.yaml text
+*.md text
+
+# Script de Maven para Windows
+*.cmd text eol=crlf
+*.bat text eol=crlf
