@@ -16,6 +16,7 @@ CREATE TABLE usuarios_credenciales (
     proveedor VARCHAR(20) NOT NULL DEFAULT 'LOCAL',
     proveedor_id VARCHAR(255),
     password_hash VARCHAR(255),
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_credencial_proveedor CHECK (proveedor IN ('LOCAL', 'GOOGLE', 'APPLE'))
@@ -58,9 +59,7 @@ CREATE TABLE asientos (
     sala_id BIGINT NOT NULL REFERENCES salas(id) ON DELETE CASCADE,
     fila CHAR(1) NOT NULL,
     numero INT NOT NULL,
-    posicion_x INT NOT NULL,
-    posicion_y INT NOT NULL,
-    tipo VARCHAR(30) NOT NULL DEFAULT 'NORMAL',
+    tipo VARCHAR(30) NOT NULL DEFAULT 'NORMAL',--catologo entre pasillo, o normal
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
     CONSTRAINT uq_asiento_sala UNIQUE (sala_id, fila, numero),
@@ -91,8 +90,8 @@ CREATE TABLE reservas (
     estado VARCHAR(30) NOT NULL DEFAULT 'PENDIENTE',
     monto_total DECIMAL(10,2) NOT NULL,
     fecha_expiracion TIMESTAMP,
-    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_reserva_estado CHECK (estado IN ('PENDIENTE', 'CONFIRMADA', 'CANCELADA', 'EXPIRADA')),
     CONSTRAINT chk_reserva_monto CHECK (monto_total >= 0)
@@ -120,7 +119,7 @@ CREATE TABLE pagos (
     moneda VARCHAR(3) NOT NULL DEFAULT 'USD',
     estado VARCHAR(30) NOT NULL DEFAULT 'PENDIENTE',
     fecha_pago TIMESTAMP,
-    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_pago_proveedor CHECK (proveedor IN ('STRIPE', 'PAYPAL')),
     CONSTRAINT chk_pago_estado CHECK (estado IN ('PENDIENTE', 'APROBADO', 'RECHAZADO', 'REEMBOLSADO')),
