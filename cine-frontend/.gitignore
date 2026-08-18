@@ -1,0 +1,56 @@
+# ── Compiled output ─────────────────────────────────────────────
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# ── Node / Package managers ──────────────────────────────────────
+/node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+.pnpm-store/
+
+# ── Angular cache ─────────────────────────────────────────────────
+/.angular/cache
+
+# ── Environment files (NEVER commit secrets) ─────────────────────
+src/environments/environment.ts
+src/environments/environment.development.ts
+*.env
+.env
+.env.local
+.env.*.local
+
+# ── IDEs and editors ──────────────────────────────────────────────
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# ── VS Code ───────────────────────────────────────────────────────
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ── Testing ───────────────────────────────────────────────────────
+/coverage
+__screenshots__/
+
+# ── Build artifacts ───────────────────────────────────────────────
+.sass-cache/
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
+
+# ── System files ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

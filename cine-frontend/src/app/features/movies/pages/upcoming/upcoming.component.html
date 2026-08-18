@@ -1,0 +1,41 @@
+<div class="space-y-8 pb-16 animate-fade-in">
+
+  <!-- Header -->
+  <div class="text-center space-y-2 py-8">
+    <div class="inline-flex items-center gap-2 badge badge-primary text-sm mb-3 px-3 py-1.5">
+      🕐 Próximamente
+    </div>
+    <h1 class="text-4xl font-black" style="color: var(--text-primary);">Próximos Estrenos</h1>
+    <p class="text-sm" style="color: var(--text-muted);">Las películas que llegarán muy pronto a nuestras salas.</p>
+  </div>
+
+  <!-- Grid de películas -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children">
+    @for (movie of movies; track movie.id) {
+      <div class="card-cinema p-5 flex gap-4 animate-fade-in-up" style="animation-fill-mode: both;">
+        <img [src]="movie.posterUrl" [alt]="movie.titulo"
+             class="w-24 h-36 object-cover rounded-xl shrink-0"
+             style="border: 1px solid var(--border);" />
+        <div class="space-y-2 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="badge badge-primary">Próximamente</span>
+            <span class="badge badge-slate">{{ movie.clasificacion }}</span>
+          </div>
+          <h2 class="font-bold text-base leading-tight" style="color: var(--text-primary);">{{ movie.titulo }}</h2>
+          <p class="text-xs line-clamp-2" style="color: var(--text-muted);">{{ movie.descripcion }}</p>
+          <div class="text-xs space-y-1" style="color: var(--text-muted);">
+            <p><strong style="color: var(--text-secondary);">Estreno:</strong> {{ movie.fechaEstreno }}</p>
+            <p><strong style="color: var(--text-secondary);">Duración:</strong> {{ movie.duracionMinutos }} min</p>
+          </div>
+          <button
+            class="mt-2 w-full py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-not-allowed"
+            style="color: var(--text-muted); border-color: var(--border); background: transparent;"
+            disabled>
+            No disponible aún
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

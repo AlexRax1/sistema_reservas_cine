@@ -1,0 +1,48 @@
+<footer style="background: var(--bg-surface); border-top: 1px solid var(--border);">
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+
+      <!-- Brand -->
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-base"
+               style="background: var(--accent); color: #fff; box-shadow: 0 2px 12px var(--accent-glow);">C</div>
+          <span class="font-extrabold text-sm" style="color: var(--text-primary);">CINEMA<span style="color: var(--accent-soft);">APP</span></span>
+        </div>
+        <p class="text-xs leading-relaxed" style="color: var(--text-muted); max-width: 200px;">
+          Tu plataforma de reservas de cine. Elige, reserva y disfruta la mejor experiencia cinematográfica.
+        </p>
+      </div>
+
+      <!-- Navigation -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-widest" style="color: var(--text-muted);">Explorar</h4>
+        <nav class="flex flex-col gap-2">
+          <a routerLink="/cartelera" class="text-xs footer-link">🎬 Cartelera</a>
+          <a routerLink="/proximos-estrenos" class="text-xs footer-link">⏰ Próximos estrenos</a>
+          <a routerLink="/mis-reservas" class="text-xs footer-link">🎟️ Mis reservas</a>
+        </nav>
+      </div>
+
+      <!-- Account -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-widest" style="color: var(--text-muted);">Cuenta</h4>
+        <nav class="flex flex-col gap-2">
+          <a routerLink="/auth/login" class="text-xs footer-link">Iniciar sesión</a>
+          <a routerLink="/auth/register" class="text-xs footer-link">Crear cuenta</a>
+          <span class="text-xs cursor-pointer" style="color: var(--text-muted);">Política de privacidad</span>
+          <span class="text-xs cursor-pointer" style="color: var(--text-muted);">Términos de uso</span>
+        </nav>
+      </div>
+
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t pt-6" style="border-color: var(--border);">
+      <p class="text-xs" style="color: var(--text-muted);">© 2026 CinemaApp — Prototipo de portafolio · Angular + Spring Boot</p>
+      <div class="flex items-center gap-2 text-xs" style="color: var(--text-muted);">
+        <span class="w-1.5 h-1.5 rounded-full inline-block" style="background: var(--green); box-shadow: 0 0 5px var(--green);"></span>
+        Todos los sistemas operativos
+      </div>
+    </div>
+  </div>
+</footer>

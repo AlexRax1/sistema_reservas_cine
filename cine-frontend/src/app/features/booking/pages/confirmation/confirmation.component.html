@@ -1,0 +1,115 @@
+@if (booking) {
+<div class="max-w-2xl mx-auto space-y-10 pb-16 animate-fade-in">
+
+  <!-- SUCCESS HERO -->
+  <div class="text-center space-y-5 pt-8">
+    <!-- Animated checkmark -->
+    <div class="relative inline-flex">
+      <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto"
+           style="background: var(--accent-muted); border: 2px solid var(--accent);"
+           [class]="showAnimation ? 'scale-in' : 'opacity-0'">
+        <svg class="w-12 h-12" style="color: var(--accent-soft);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <!-- Glow rings -->
+      <div class="absolute inset-0 rounded-full animate-ping opacity-20" style="background: var(--accent);"></div>
+    </div>
+
+    <div class="space-y-2">
+      <h1 class="text-3xl font-black" style="color: var(--text-primary);">¡Reserva confirmada!</h1>
+      <p class="text-sm" style="color: var(--text-secondary);">Tu pago fue procesado exitosamente. ¡Disfruta la película!</p>
+    </div>
+
+    <!-- Reservation code -->
+    <div class="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl"
+         style="background: var(--accent-muted); border: 2px dashed var(--accent);">
+      <span class="text-xs font-semibold" style="color: var(--text-secondary);">Código de reserva</span>
+      <span class="text-2xl font-black tracking-widest" style="color: var(--accent-soft);">{{ booking.codigoReserva }}</span>
+    </div>
+  </div>
+
+  <!-- TICKET CARD -->
+  <div class="card-cinema overflow-hidden">
+    <!-- Movie header -->
+    <div class="flex gap-4 p-6 border-b" style="border-color: var(--border);">
+      @if (booking.funcion?.pelicula?.posterUrl) {
+        <img
+          [src]="booking.funcion!.pelicula!.posterUrl"
+          [alt]="booking.funcion!.pelicula!.titulo"
+          class="w-16 h-22 rounded-xl object-cover flex-shrink-0 shadow-lg"
+          style="border: 1px solid var(--border);"
+        />
+      }
+      <div class="space-y-1">
+        <h2 class="text-lg font-black" style="color: var(--text-primary);">{{ booking.funcion?.pelicula?.titulo }}</h2>
+        <p class="text-sm" style="color: var(--text-secondary);">{{ booking.funcion?.sala?.nombre }}</p>
+        <p class="text-sm" style="color: var(--text-secondary);">
+          {{ formatDate(booking.funcion?.fechaHoraInicio ?? '') }}
+        </p>
+        <p class="text-sm font-bold" style="color: var(--accent-soft);">
+          {{ formatTime(booking.funcion?.fechaHoraInicio ?? '') }} — {{ formatTime(booking.funcion?.fechaHoraFin ?? '') }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Seats row -->
+    <div class="px-6 py-4 border-b" style="border-color: var(--border);">
+      <p class="text-xs font-semibold mb-3" style="color: var(--text-secondary);">Asientos reservados</p>
+      <div class="flex flex-wrap gap-2">
+        @for (seat of booking.asientos; track seat.asientoId) {
+          <span class="px-3 py-1.5 rounded-lg text-xs font-bold"
+            [style]="seat.tipoAsiento === 'VIP'
+              ? 'background: var(--seat-vip-bg); color: var(--seat-vip-color); border: 1.5px solid var(--seat-vip-border);'
+              : 'background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border);'">
+            @if (seat.tipoAsiento === 'VIP') { &#9733; {{ getSeatLabel(seat) }} } @else { {{ getSeatLabel(seat) }} }
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Ticket perforation -->
+    <div class="flex items-center px-4" style="margin: -1px 0; position: relative;">
+      <div class="w-6 h-6 rounded-full flex-shrink-0" style="background: var(--bg-base); border: 1px solid var(--border);"></div>
+      <div class="flex-1 border-t-2 border-dashed mx-2" style="border-color: var(--border);"></div>
+      <div class="w-6 h-6 rounded-full flex-shrink-0" style="background: var(--bg-base); border: 1px solid var(--border);"></div>
+    </div>
+
+    <!-- QR section -->
+    <div class="p-6 text-center space-y-3">
+      <p class="text-xs font-semibold" style="color: var(--text-secondary);">Muestra este código QR en la entrada</p>
+      <!-- Fake QR Code -->
+      <div class="inline-flex items-center justify-center w-32 h-32 rounded-xl mx-auto"
+           style="background: white; padding: 8px;">
+        <div class="grid grid-cols-8 gap-px w-full h-full">
+          @for (cell of qrPattern; track $index) {
+            <div [style]="cell ? 'background: #1a1a2e;' : 'background: white;'"></div>
+          }
+        </div>
+      </div>
+      <p class="text-xs font-mono" style="color: var(--text-muted);">{{ booking.codigoReserva }}</p>
+    </div>
+
+    <!-- Total -->
+    <div class="px-6 pb-6">
+      <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--accent-muted); border: 1px solid var(--accent-glow);">
+        <span class="text-sm" style="color: var(--text-secondary);">Total pagado</span>
+        <span class="text-lg font-black" style="color: var(--accent-soft);">Q{{ (booking.montoTotal + 1.50).toFixed(2) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <a routerLink="/mis-reservas" class="btn-ghost inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+      Mis Reservas
+    </a>
+    <button (click)="goHome()" class="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4" /></svg>
+      Ver más películas
+    </button>
+  </div>
+
+</div>
+}

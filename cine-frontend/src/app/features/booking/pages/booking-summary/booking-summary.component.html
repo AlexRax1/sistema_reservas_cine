@@ -1,0 +1,129 @@
+@if (booking) {
+<div class="max-w-3xl mx-auto space-y-8 pb-16 animate-fade-in">
+
+  <!-- BREADCRUMB -->
+  <nav class="flex items-center gap-2 text-xs" style="color: var(--text-muted);">
+    <a routerLink="/cartelera" style="color: var(--text-muted);" class="hover:underline transition-colors">Cartelera</a>
+    <span>›</span>
+    <span style="color: var(--text-secondary);">Asientos</span>
+    <span>›</span>
+    <span style="color: var(--accent-soft); font-weight: 600;">Resumen</span>
+    <span>›</span>
+    <span>Pago</span>
+    <span>›</span>
+    <span>Confirmación</span>
+  </nav>
+
+  <!-- HEADER -->
+  <div>
+    <h1 class="text-2xl font-black" style="color: var(--text-primary);">Resumen de tu reserva</h1>
+    <p class="text-sm mt-1" style="color: var(--text-secondary);">Verifica los detalles antes de continuar al pago.</p>
+  </div>
+
+  <!-- MOVIE + SHOWTIME CARD -->
+  <div class="card-cinema p-6 flex gap-5">
+    @if (booking.funcion?.pelicula?.posterUrl) {
+      <img
+        [src]="booking.funcion!.pelicula!.posterUrl"
+        [alt]="booking.funcion!.pelicula!.titulo"
+        class="w-20 h-28 rounded-xl object-cover flex-shrink-0 shadow-lg"
+        style="border: 1px solid var(--border);"
+      />
+    }
+    <div class="space-y-2 flex-1">
+      <div class="flex flex-wrap items-start justify-between gap-2">
+        <h2 class="text-lg font-black leading-tight" style="color: var(--text-primary);">
+          {{ booking.funcion?.pelicula?.titulo ?? 'Película' }}
+        </h2>
+        <span class="badge badge-primary">{{ booking.codigoReserva }}</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm" style="color: var(--text-secondary);">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4" style="color: var(--accent-soft);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          <span>{{ formatDate(booking.funcion?.fechaHoraInicio ?? '') }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4" style="color: var(--accent-soft);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>{{ formatTime(booking.funcion?.fechaHoraInicio ?? '') }} — {{ formatTime(booking.funcion?.fechaHoraFin ?? '') }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4" style="color: var(--accent-soft);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
+          <span>{{ booking.funcion?.sala?.nombre ?? 'Sala' }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4" style="color: var(--accent-soft);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <span>{{ booking.asientos?.length ?? 0 }} asiento(s)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEATS BREAKDOWN -->
+  <div class="card-cinema overflow-hidden">
+    <div class="px-6 py-4 border-b" style="border-color: var(--border);">
+      <h3 class="font-bold text-sm" style="color: var(--text-primary);">Detalle de asientos</h3>
+    </div>
+    <div class="divide-y" style="border-color: var(--border);">
+      @for (seat of booking.asientos; track seat.asientoId) {
+        <div class="px-6 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-black"
+              [style]="seat.tipoAsiento === 'VIP'
+                ? 'background: var(--seat-vip-bg); color: var(--seat-vip-color); border: 1.5px solid var(--seat-vip-border); font-size: 16px;'
+                : 'background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border);'">
+              @if (seat.tipoAsiento === 'VIP') { &#9733; } @else { {{ seat.fila }}{{ seat.numero }} }
+            </span>
+            <div>
+              <p class="text-sm font-semibold" style="color: var(--text-primary);">
+                Fila {{ seat.fila }}, Asiento {{ seat.numero }}
+              </p>
+              <p class="text-xs" style="color: var(--text-secondary);">
+                {{ getSeatTypeLabel(seat.tipoAsiento) }} · {{ getTicketLabel(seat.tipoTicket) }}
+              </p>
+            </div>
+          </div>
+          <span class="text-sm font-bold" style="color: var(--accent-soft);">Q{{ seat.precio.toFixed(2) }}</span>
+        </div>
+      }
+    </div>
+    <!-- TOTALS -->
+    <div class="px-6 py-4 space-y-2 border-t" style="border-color: var(--border); background: var(--bg-elevated);">
+      <div class="flex justify-between text-sm" style="color: var(--text-secondary);">
+        <span>Subtotal ({{ booking.asientos?.length ?? 0 }} entradas)</span>
+        <span>Q{{ booking.montoTotal.toFixed(2) }}</span>
+      </div>
+      <div class="flex justify-between text-sm" style="color: var(--text-secondary);">
+        <span>Cargo por servicio</span>
+        <span>Q1.50</span>
+      </div>
+      <div class="flex justify-between text-base font-black pt-2 border-t" style="border-color: var(--border); color: var(--text-primary);">
+        <span>Total</span>
+        <span style="color: var(--accent-soft);">Q{{ (booking.montoTotal + 1.50).toFixed(2) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <a routerLink="/reservas/asientos" class="btn-ghost inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm flex-1">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+      Cambiar asientos
+    </a>
+    <button (click)="proceedToPayment()" class="btn-primary inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-bold flex-1 sm:flex-none sm:min-w-48">
+      Continuar al pago
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+    </button>
+  </div>
+
+</div>
+}
+
+@if (!booking) {
+  <div class="text-center py-24 animate-fade-in">
+    <div class="text-5xl mb-4">🎟️</div>
+    <p style="color: var(--text-secondary);">No hay ninguna reserva activa.</p>
+    <a routerLink="/cartelera" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm mt-6">
+      Ir a Cartelera
+    </a>
+  </div>
+}

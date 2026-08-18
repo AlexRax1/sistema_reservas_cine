@@ -1,0 +1,181 @@
+@if (booking) {
+<div class="max-w-4xl mx-auto space-y-8 pb-16 animate-fade-in">
+
+  <!-- BREADCRUMB -->
+  <nav class="flex items-center gap-2 text-xs" style="color: var(--text-muted);">
+    <a routerLink="/cartelera" style="color: var(--text-muted);" class="hover:underline transition-colors">Cartelera</a>
+    <span>›</span>
+    <span>Asientos</span>
+    <span>›</span>
+    <a routerLink="/reservas/resumen" style="color: var(--text-secondary);" class="hover:underline transition-colors">Resumen</a>
+    <span>›</span>
+    <span style="color: var(--accent-soft); font-weight: 600;">Pago</span>
+    <span>›</span>
+    <span>Confirmación</span>
+  </nav>
+
+  <!-- HEADER -->
+  <div>
+    <h1 class="text-2xl font-black" style="color: var(--text-primary);">Método de pago</h1>
+    <p class="text-sm mt-1" style="color: var(--text-secondary);">Tu información está protegida con cifrado SSL de 256 bits.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+    <!-- LEFT: PAYMENT FORM -->
+    <div class="lg:col-span-3 space-y-6">
+
+      <!-- PROVIDER SELECTOR -->
+      <div class="card-cinema p-5 space-y-4">
+        <h3 class="text-sm font-bold" style="color: var(--text-secondary);">Elige tu método de pago</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <!-- STRIPE -->
+          <button
+            (click)="selectedProvider = 'STRIPE'"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer"
+            [style]="selectedProvider === 'STRIPE'
+              ? 'border-color: var(--accent); background: var(--accent-muted);'
+              : 'border-color: var(--border); background: var(--bg-input);'">
+            <svg viewBox="0 0 24 24" class="w-8 h-8" [style]="selectedProvider === 'STRIPE' ? 'color: var(--accent-soft);' : 'color: var(--text-muted);'" fill="currentColor">
+              <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
+            </svg>
+            <span class="text-xs font-bold" [style]="selectedProvider === 'STRIPE' ? 'color: var(--accent-soft);' : 'color: var(--text-muted);'">Tarjeta / Stripe</span>
+          </button>
+          <!-- PAYPAL -->
+          <button
+            (click)="selectedProvider = 'PAYPAL'"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer"
+            [style]="selectedProvider === 'PAYPAL'
+              ? 'border-color: var(--accent); background: var(--accent-muted);'
+              : 'border-color: var(--border); background: var(--bg-input);'">
+            <svg viewBox="0 0 24 24" class="w-8 h-8" [style]="selectedProvider === 'PAYPAL' ? 'color: var(--accent-soft);' : 'color: var(--text-muted);'" fill="currentColor">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 4.643-5.813 4.643h-1.479a.63.63 0 0 0-.625.534l-.865 5.488-.24 1.533a.33.33 0 0 0 .325.379h2.287c.46 0 .85-.334.923-.788l.038-.199.735-4.653.047-.257c.073-.454.463-.788.922-.788h.582c3.76 0 6.7-1.528 7.559-5.947.358-1.839.173-3.375-.748-4.458z"/>
+            </svg>
+            <span class="text-xs font-bold" [style]="selectedProvider === 'PAYPAL' ? 'color: var(--accent-soft);' : 'color: var(--text-muted);'">PayPal</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD FORM (Solo si STRIPE) -->
+      @if (selectedProvider === 'STRIPE') {
+        <div class="card-cinema p-6 space-y-4">
+          <h3 class="text-sm font-bold" style="color: var(--text-secondary);">Datos de la tarjeta</h3>
+
+          <!-- Card number -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold" style="color: var(--text-secondary);">Número de tarjeta</label>
+            <div class="relative">
+              <input
+                type="text"
+                [(ngModel)]="cardNumber"
+                (input)="formatCardNumber($event)"
+                class="input-cinema pr-12"
+                placeholder="0000 0000 0000 0000"
+                maxlength="19"
+              />
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
+                <svg viewBox="0 0 48 48" class="w-6 h-4" fill="none"><rect width="48" height="48" rx="4" fill="#1a1f71"/><rect y="12" width="48" height="12" fill="#f7941d"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold" style="color: var(--text-secondary);">Nombre en la tarjeta</label>
+            <input type="text" [(ngModel)]="cardName" class="input-cinema" placeholder="NOMBRE APELLIDO" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold" style="color: var(--text-secondary);">Vencimiento</label>
+              <input type="text" [(ngModel)]="cardExpiry" (input)="formatExpiry($event)" class="input-cinema" placeholder="MM/AA" maxlength="5" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold" style="color: var(--text-secondary);">CVV</label>
+              <input type="password" [(ngModel)]="cardCvv" class="input-cinema" placeholder="•••" maxlength="4" />
+            </div>
+          </div>
+
+          <!-- Security badge -->
+          <div class="flex items-center gap-2 p-3 rounded-lg text-xs" style="background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border);">
+            <svg class="w-4 h-4 flex-shrink-0" style="color: var(--green);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            Transacción segura · Cifrado SSL 256-bit · PCI DSS Compliant
+          </div>
+        </div>
+      }
+
+      <!-- PAYPAL MOCK -->
+      @if (selectedProvider === 'PAYPAL') {
+        <div class="card-cinema p-8 text-center space-y-4">
+          <div class="text-4xl">🅿️</div>
+          <p class="text-sm" style="color: var(--text-secondary);">Al hacer clic en "Pagar" serás redirigido a PayPal para completar tu pago de forma segura.</p>
+          <div class="flex items-center justify-center gap-2 text-xs" style="color: var(--text-secondary);">
+            <svg class="w-4 h-4" style="color: var(--green);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            Compra protegida por PayPal Buyer Protection
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="lg:col-span-2 space-y-4">
+      <div class="card-cinema p-5 space-y-4">
+        <h3 class="text-sm font-bold" style="color: var(--text-secondary);">Tu pedido</h3>
+
+        <div class="text-sm space-y-1">
+          <p class="font-bold" style="color: var(--text-primary);">{{ booking.funcion?.pelicula?.titulo }}</p>
+          <p class="text-xs" style="color: var(--text-secondary);">{{ booking.funcion?.sala?.nombre }}</p>
+        </div>
+
+        <div class="divide-y text-sm" style="border-color: var(--border);">
+          <div class="flex justify-between py-2" style="color: var(--text-secondary);">
+            <span>Entradas ({{ booking.asientos?.length }})</span>
+            <span>Q{{ booking.montoTotal.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between py-2" style="color: var(--text-secondary);">
+            <span>Cargo servicio</span>
+            <span>Q1.50</span>
+          </div>
+          <div class="flex justify-between py-2 font-black text-base" style="color: var(--accent-soft);">
+            <span>Total</span>
+            <span>Q{{ totalWithFee.toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAY BUTTON -->
+      <button
+        (click)="pay()"
+        [disabled]="isProcessing"
+        class="btn-primary w-full py-4 rounded-xl text-base font-black flex items-center justify-center gap-3 relative overflow-hidden"
+        [style]="isProcessing ? 'opacity: 0.7; cursor: not-allowed;' : ''">
+        @if (isProcessing) {
+          <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          Procesando pago...
+        } @else {
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Pagar Q{{ totalWithFee.toFixed(2) }}
+        }
+      </button>
+
+      <p class="text-center text-xs" style="color: var(--text-muted);">
+        Al pagar aceptas nuestros <span style="color: var(--text-secondary);" class="cursor-pointer hover:underline transition-colors">Términos de Servicio</span> y <span style="color: var(--text-secondary);" class="cursor-pointer hover:underline transition-colors">Política de privacidad</span>.
+      </p>
+    </div>
+  </div>
+
+</div>
+}
+
+@if (!booking) {
+  <div class="text-center py-24 animate-fade-in">
+    <div class="text-5xl mb-4">💳</div>
+    <p style="color: var(--text-secondary);">No hay ninguna reserva activa.</p>
+    <a routerLink="/cartelera" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm mt-6">
+      Ir a Cartelera
+    </a>
+  </div>
+}

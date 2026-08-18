@@ -1,0 +1,113 @@
+<div class="space-y-12 pb-16 animate-fade-in">
+
+  @if (featuredMovie) {
+    <section class="relative rounded-2xl overflow-hidden" style="min-height: 480px; background: var(--bg-elevated);">
+      <img [src]="featuredMovie.backdropUrl" [alt]="featuredMovie.titulo"
+        class="absolute inset-0 w-full h-full object-cover" style="opacity: 0.22;" />
+      <div class="absolute inset-0" style="background: linear-gradient(to top, var(--bg-elevated) 0%, color-mix(in srgb, var(--bg-elevated) 75%, transparent) 52%, transparent 100%);"></div>
+      <div class="absolute inset-0" style="background: linear-gradient(to right, var(--bg-elevated) 0%, color-mix(in srgb, var(--bg-elevated) 55%, transparent) 55%, transparent 100%);"></div>
+      <div class="absolute top-0 right-0 w-72 h-72 rounded-full opacity-8 pointer-events-none" style="background: radial-gradient(circle, var(--accent), transparent 70%); transform: translate(30%, -30%);"></div>
+      <div class="relative z-10 flex items-end h-full p-6 sm:p-10 lg:p-14" style="min-height: 480px;">
+        <div class="max-w-2xl space-y-5 animate-fade-in-up">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="badge badge-primary">⭐ Destacada</span>
+            <span class="badge badge-slate">{{ featuredMovie.clasificacion }}</span>
+            <span class="badge badge-slate">{{ featuredMovie.duracionMinutos }} min</span>
+            @for (g of featuredMovie.generos?.slice(0, 2); track g) {
+              <span class="badge badge-slate">{{ g }}</span>
+            }
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-none tracking-tight" style="color: var(--text-primary);">{{ featuredMovie.titulo }}</h1>
+          <p class="text-base leading-relaxed line-clamp-3" style="color: var(--text-secondary); max-width: 520px;">{{ featuredMovie.descripcion }}</p>
+          <div class="flex items-center gap-4 text-sm" style="color: var(--text-muted);">
+            <span><strong style="color: var(--text-secondary);">Director:</strong> {{ featuredMovie.director }}</span>
+            <span class="hidden sm:block">·</span>
+            <span class="hidden sm:block">{{ featuredMovie.reparto?.slice(0, 2)?.join(', ') }}</span>
+          </div>
+          <div class="flex items-center gap-3 pt-2 flex-wrap">
+            <a [routerLink]="['/peliculas', featuredMovie.id]" class="btn-shimmer flex items-center gap-2 px-6 py-3 text-sm rounded-xl">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
+              Ver horarios y reservar
+            </a>
+            <button class="btn-ghost flex items-center gap-2 px-5 py-3 text-sm rounded-xl">
+              <svg class="w-4 h-4" style="color: var(--accent-soft);" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Ver tráiler
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="space-y-4">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="section-title flex items-center gap-2"><span>🎬</span> En Cartelera</h2>
+        <p class="text-sm mt-1" style="color: var(--text-muted);">{{ filteredMovies.length }} película{{ filteredMovies.length !== 1 ? 's' : '' }} disponible{{ filteredMovies.length !== 1 ? 's' : '' }}</p>
+      </div>
+      <div class="relative w-full sm:w-72">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="Buscar película, director..." class="input-cinema pl-10 pr-9" />
+        @if (searchTerm) {
+          <button (click)="clearSearch()" class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        }
+      </div>
+    </div>
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      @for (genre of genres; track genre) {
+        <button (click)="selectGenre(genre)" class="shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200"
+          [style]="selectedGenre === genre
+            ? 'background: var(--accent-muted); color: var(--accent-soft); border-color: var(--accent-glow);'
+            : 'background: transparent; color: var(--text-muted); border-color: var(--border);'">
+          {{ genre }}
+        </button>
+      }
+    </div>
+  </section>
+
+  @if (filteredMovies.length > 0) {
+    <section>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 stagger-children">
+        @for (movie of filteredMovies; track movie.id) {
+          <a [routerLink]="['/peliculas', movie.id]" class="card-cinema group flex flex-col overflow-hidden animate-fade-in-up" style="animation-fill-mode: both; text-decoration: none; cursor: pointer;">
+            <div class="relative overflow-hidden" style="aspect-ratio: 2/3; background: var(--bg-elevated);">
+              <img [src]="movie.posterUrl" [alt]="movie.titulo" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3"
+                   style="background: linear-gradient(to top, color-mix(in srgb, var(--bg-elevated) 97%, transparent) 0%, color-mix(in srgb, var(--bg-elevated) 40%, transparent) 50%, transparent 100%);">
+                <div class="flex justify-end"><span class="badge badge-slate text-[10px]">{{ movie.clasificacion }}</span></div>
+                <div class="text-xs space-y-0.5" style="color: var(--text-secondary);"><p class="font-medium" style="color: var(--text-primary);">{{ movie.director }}</p><p class="text-[11px] line-clamp-1">{{ movie.reparto?.slice(0, 2)?.join(' · ') }}</p></div>
+              </div>
+              <div class="absolute top-2.5 left-2.5"><span class="badge badge-primary text-[10px]">En cartelera</span></div>
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: var(--accent); opacity: 0.9;">
+                  <svg class="w-5 h-5" style="color: #fff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col flex-1 p-3 space-y-2">
+              <div class="flex items-center justify-between text-[11px]" style="color: var(--text-muted);">
+                <span style="color: var(--accent-soft); font-weight: 600;">{{ movie.generos?.[0] }}</span>
+                <span>{{ movie.duracionMinutos }}m</span>
+              </div>
+              <h3 class="font-bold text-sm leading-tight line-clamp-2 transition-colors" style="color: var(--text-primary);">{{ movie.titulo }}</h3>
+              <p class="text-[11px] line-clamp-2 leading-relaxed flex-1" style="color: var(--text-muted);">{{ movie.descripcion }}</p>
+              <div class="mt-auto flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all duration-200"
+                   style="color: var(--accent-soft); border-color: var(--border); background: var(--bg-elevated);">
+                Ver detalles y horarios
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </section>
+  } @else {
+    <section class="flex flex-col items-center justify-center py-20 space-y-4">
+      <div class="text-5xl">🎭</div>
+      <h3 class="text-lg font-bold" style="color: var(--text-primary);">No se encontraron películas</h3>
+      <p class="text-sm text-center max-w-xs" style="color: var(--text-muted);">Intenta cambiar el género o ajusta tu búsqueda.</p>
+      <button (click)="clearSearch(); selectGenre('Todos')" class="btn-ghost text-sm px-5 py-2 rounded-lg mt-2">Limpiar filtros</button>
+    </section>
+  }
+
+</div>

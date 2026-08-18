@@ -1,0 +1,221 @@
+@if (movie) {
+  <div class="space-y-12 pb-20 animate-fade-in">
+
+    <!-- BREADCRUMB -->
+    <nav class="flex items-center gap-1.5 text-xs" style="color: var(--text-muted);" aria-label="Breadcrumb">
+      <a routerLink="/cartelera" class="transition-colors" style="color: var(--text-secondary);"
+         onmouseenter="this.style.color='var(--accent-soft)'" onmouseleave="this.style.color='var(--text-secondary)'">Cartelera</a>
+      <svg class="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <span style="color: var(--text-primary);" class="truncate max-w-xs">{{ movie.titulo }}</span>
+    </nav>
+
+    <!-- HERO -->
+    <section class="relative rounded-2xl overflow-hidden" style="background: var(--bg-elevated); min-height: 500px;">
+      <img [src]="movie.backdropUrl" [alt]="movie.titulo"
+           class="absolute inset-0 w-full h-full object-cover select-none"
+           style="opacity: 0.25;" draggable="false" />
+      <div class="absolute inset-0" style="background: linear-gradient(to top, var(--bg-elevated) 0%, rgba(0,0,0,0.7) 45%, transparent 100%);"></div>
+      <div class="absolute inset-0" style="background: linear-gradient(to right, var(--bg-elevated) 0%, rgba(0,0,0,0.5) 55%, transparent 100%);"></div>
+      <!-- Accent glow -->
+      <div class="absolute top-0 right-0 w-80 h-80 rounded-full pointer-events-none opacity-15" style="background: radial-gradient(circle, var(--accent), transparent 70%); transform: translate(30%,-30%);"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-start gap-8 p-6 sm:p-10 lg:p-14" style="min-height: 500px; padding-top: clamp(2rem, 5vw, 4rem);">
+
+        <!-- Poster -->
+        <div class="hidden md:block shrink-0 self-center md:self-end">
+          <div class="relative group">
+            <img [src]="movie.posterUrl" [alt]="movie.titulo"
+                 class="w-44 lg:w-52 rounded-2xl object-cover shadow-2xl transition-transform duration-500 group-hover:scale-[1.03]"
+                 style="border: 2px solid var(--border-strong); aspect-ratio: 2/3;" />
+            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-4/5 h-8 rounded-full blur-xl"
+                 style="background: var(--accent-glow);"></div>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 space-y-5 self-end max-w-2xl pb-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="badge badge-primary">{{ movie.estado === 'EN_CARTELERA' ? '▶ En cartelera' : '🕐 Próximamente' }}</span>
+            <span class="badge badge-slate">{{ movie.clasificacion }}</span>
+            <span class="badge badge-slate">{{ formatDuration(movie.duracionMinutos) }}</span>
+            <span class="badge badge-slate">{{ releaseYear(movie.fechaEstreno) }}</span>
+            @for (g of movie.generos?.slice(0, 3); track g) {
+              <span class="badge badge-slate">{{ g }}</span>
+            }
+          </div>
+
+          <div>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-none tracking-tight" style="color: var(--text-primary);">{{ movie.titulo }}</h1>
+            @if (movie.tituloOriginal && movie.tituloOriginal !== movie.titulo) {
+              <p class="text-sm mt-2 italic" style="color: var(--text-muted);">Título original: {{ movie.tituloOriginal }}</p>
+            }
+          </div>
+
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--text-secondary); max-width: 580px;">{{ movie.descripcion }}</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 pt-2">
+            <div style="border-top: 1px solid var(--border);" class="pt-3">
+              <span class="text-[10px] font-bold tracking-widest uppercase block mb-1" style="color: var(--text-muted);">Director</span>
+              <span class="text-sm font-semibold" style="color: var(--text-primary);">{{ movie.director }}</span>
+            </div>
+            <div style="border-top: 1px solid var(--border);" class="pt-3 col-span-2 sm:col-span-2">
+              <span class="text-[10px] font-bold tracking-widest uppercase block mb-1" style="color: var(--text-muted);">Reparto</span>
+              <span class="text-sm font-semibold" style="color: var(--text-primary);">{{ movie.reparto?.slice(0, 4)?.join(', ') }}</span>
+            </div>
+          </div>
+
+          <div class="md:hidden">
+            <a [routerLink]="['/peliculas', movie.id]" fragment="funciones" class="btn-primary inline-flex items-center gap-2 text-sm px-5 py-2.5 rounded-xl" style="text-decoration:none;">
+              Ver funciones disponibles
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUNCIONES -->
+    <section id="funciones" class="space-y-7 scroll-mt-20">
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+           style="border-bottom: 1px solid var(--border); padding-bottom: 1.25rem;">
+        <div>
+          <h2 class="section-title">🎟️ Funciones disponibles</h2>
+          <p class="text-sm mt-1" style="color: var(--text-muted);">Selecciona un día y elige el horario que prefieras.</p>
+        </div>
+
+        <!-- Date tabs -->
+        <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide p-1 rounded-xl shrink-0"
+             style="background: var(--bg-elevated); border: 1px solid var(--border);">
+          @for (tab of dateTabs; track tab.offset) {
+            <button (click)="selectDate(tab.offset)"
+              class="shrink-0 flex flex-col items-center px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 min-w-[56px]"
+              [style]="selectedDateIndex === tab.offset
+                ? 'background: var(--accent); color: #fff; box-shadow: 0 2px 14px var(--accent-glow);'
+                : 'background: transparent; color: var(--text-muted);'">
+              <span class="font-black text-sm leading-none">{{ tab.offset === 0 ? 'Hoy' : tab.offset === 1 ? 'Mañ' : tab.shortLabel.split(' ')[0] }}</span>
+              @if (tab.offset > 1) {
+                <span class="text-[10px] mt-0.5 opacity-70">{{ tab.shortLabel.split(' ').slice(1).join(' ') }}</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Room groups -->
+      <div class="space-y-8">
+        @for (group of groupedShowtimes; track group.roomName) {
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl leading-none">{{ roomIcon(group.roomType) }}</span>
+              <div>
+                <h3 class="font-extrabold text-base" style="color: var(--text-primary);">{{ group.roomName }}</h3>
+                <span class="badge text-[10px] mt-0.5"
+                  [class]="group.roomType === 'IMAX' ? 'badge-primary' : group.roomType === 'VIP' ? 'badge-rose' : 'badge-slate'">
+                  {{ group.roomType }}
+                </span>
+              </div>
+              <span class="hidden sm:block ml-auto text-xs" style="color: var(--text-muted);">
+                @if (group.roomType === 'IMAX') { Pantalla gigante · Audio 12 canales · Proyección láser 4K }
+                @else if (group.roomType === 'VIP') { Butacas reclinables · Servicio de bebidas · Privacidad }
+                @else if (group.roomType === '3D') { 3D Dolby Atmos · Lentes incluidos }
+                @else { Comodidad estándar · Climatización perfecta }
+              </span>
+            </div>
+
+            <!-- Showtime chips -->
+            <div class="flex flex-wrap gap-3">
+              @for (st of group.showtimes; track st.id) {
+                @let avail = availabilityLevel(st.asientosDisponibles);
+                <button (click)="selectShowtime(st)"
+                  [disabled]="avail === 'sold-out'"
+                  class="flex flex-col items-start rounded-xl p-4 transition-all duration-200 min-w-[150px] group/st"
+                  [style]="avail === 'sold-out'
+                    ? 'background: var(--bg-elevated); border: 1px solid var(--border); cursor: not-allowed; opacity: 0.5;'
+                    : 'background: var(--bg-elevated); border: 1px solid var(--border); cursor: pointer;'"
+                  onmouseover="if(!this.disabled){ this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 1px var(--accent), 0 4px 20px var(--accent-glow)'; }"
+                  onmouseout="if(!this.disabled){ this.style.borderColor='var(--border)'; this.style.boxShadow='none'; }">
+
+                  <span class="text-2xl font-black leading-none" style="color: var(--text-primary);">{{ st.fechaHoraInicio.split('T')[1].substring(0,5) }}</span>
+                  <span class="text-[11px] mt-0.5" style="color: var(--text-muted);">Fin {{ st.fechaHoraFin.split('T')[1].substring(0,5) }}</span>
+
+                  <div class="flex items-center justify-between w-full mt-3 pt-2.5" style="border-top: 1px solid var(--border);">
+                    <span class="text-sm font-bold" style="color: var(--accent-soft);">Q{{ st.precioBase.toFixed(2) }}</span>
+
+                    @if (avail === 'sold-out') {
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded badge-rose">AGOTADO</span>
+                    } @else if (avail === 'low') {
+                      <span class="flex items-center gap-1 text-[10px] font-semibold" style="color: var(--rose);">
+                        <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background: var(--rose);"></span>
+                        {{ st.asientosDisponibles }} lugares
+                      </span>
+                    } @else if (avail === 'medium') {
+                      <span class="flex items-center gap-1 text-[10px] font-semibold" style="color: var(--amber);">
+                        <span class="w-1.5 h-1.5 rounded-full" style="background: var(--amber);"></span>
+                        {{ st.asientosDisponibles }} lugares
+                      </span>
+                    } @else {
+                      <span class="flex items-center gap-1 text-[10px] font-semibold" style="color: var(--green);">
+                        <span class="w-1.5 h-1.5 rounded-full" style="background: var(--green);"></span>
+                        Disponible
+                      </span>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--border);"></div>
+        }
+      </div>
+
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center gap-5 pt-2 text-xs" style="color: var(--text-muted);">
+        <span class="font-semibold">Leyenda:</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background: var(--green);"></span>Disponible</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background: var(--amber);"></span>Pocos lugares</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background: var(--rose);"></span>Últimos lugares</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background: var(--text-muted);"></span>Agotado</span>
+      </div>
+
+    </section>
+
+    <!-- TAMBIÉN EN CARTELERA -->
+    @if (relatedMovies.length > 0) {
+      <section class="space-y-5">
+        <div style="border-top: 1px solid var(--border); padding-top: 2rem;">
+          <h2 class="section-title">También en cartelera</h2>
+          <p class="text-sm mt-1" style="color: var(--text-muted);">Otras películas que podrían interesarte.</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 stagger-children">
+          @for (rel of relatedMovies; track rel.id) {
+            <a [routerLink]="['/peliculas', rel.id]" class="card-cinema group block overflow-hidden animate-fade-in-up" style="animation-fill-mode: both; text-decoration: none;">
+              <div class="relative overflow-hidden" style="aspect-ratio: 2/3;">
+                <img [src]="rel.posterUrl" [alt]="rel.titulo" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                     style="background: linear-gradient(to top, var(--bg-elevated) 0%, transparent 50%);"></div>
+              </div>
+              <div class="p-3 space-y-1">
+                <h4 class="font-bold text-sm leading-tight line-clamp-1 transition-colors" style="color: var(--text-primary);">{{ rel.titulo }}</h4>
+                <div class="flex items-center justify-between text-[11px]" style="color: var(--text-muted);">
+                  <span>{{ rel.generos?.[0] }}</span>
+                  <span>{{ rel.duracionMinutos }}m</span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+  </div>
+}
+
+@if (!movie) {
+  <div class="flex flex-col items-center justify-center min-h-[50vh] space-y-4 animate-fade-in">
+    <div class="text-5xl">🎬</div>
+    <h2 class="text-xl font-bold" style="color: var(--text-primary);">Cargando película...</h2>
+    <p class="text-sm" style="color: var(--text-muted);">Si tarda demasiado, la película no existe en la cartelera.</p>
+    <a routerLink="/cartelera" class="btn-ghost inline-flex items-center gap-2 text-sm px-4 py-2 rounded-xl" style="text-decoration:none;">← Volver a Cartelera</a>
+  </div>
+}
